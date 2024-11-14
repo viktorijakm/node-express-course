@@ -1,4 +1,4 @@
-const { log } = require('console')
+
 const os = require('os')
 
 const user = os.userInfo()
