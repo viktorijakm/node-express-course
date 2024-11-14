@@ -20,18 +20,22 @@ const getBody = (req, callback) => {
   });
 };
 
-// here, you could declare one or more variables to store what comes back from the form.
-let item = "Enter something below.";
+// Variables for the game
+let targetNumber = Math.floor(Math.random() * 100) + 1;  // random number between 1 and 100
+let message = "Please enter your number:";
+let attempts = 0;
 
 // here, you can change the form below to modify the input fields and what is displayed.
 // This is just ordinary html with string interpolation.
 const form = () => {
   return `
   <body>
-  <p>${item}</p>
+  <h1> Guess the number </h1>
+  <p>${message}</p>
+  <p>This is your ${attempts} guess</p>
   <form method="POST">
-  <input name="item"></input>
-  <button type="submit">Submit</button>
+  <input name="guess" type='number' min='1' max='100' required />
+  <button type="submit">Submit your Guess</button>
   </form>
   </body>
   `;
@@ -42,13 +46,27 @@ const server = http.createServer((req, res) => {
   console.log("req.url is ", req.url);
   if (req.method === "POST") {
     getBody(req, (body) => {
-      console.log("The body of the post is ", body);
+      // console.log("The body of the post is ", body);
+      const guess = parseInt(body["guess"], 10); // Convert guess to number
+      attempts++;
+
       // here, you can add your own logic
-      if (body["item"]) {
-        item = body["item"];
+      if (guess < targetNumber) {
+        message = `Too low! Try again.`;
+      } else if (guess > targetNumber) {
+        message = `Too high! Try again.`;
       } else {
-        item = "Nothing was entered.";
+        message = `Congratulations! You guessed the number ${targetNumber} correctly! It took you ${attempts} attempts.`;
+        // Reset the game after correct guess
+        targetNumber = Math.floor(Math.random() * 100) + 1;  // Generate a new random number
+        attempts = 0;  // Reset attempts count
       }
+
+      // if (body["item"]) {
+      //   item = body["item"];
+      // } else {
+      //   item = "Nothing was entered.";
+      // }
       // Your code changes would end here
       res.writeHead(303, {
         Location: "/",
